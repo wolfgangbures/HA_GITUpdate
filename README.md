@@ -43,7 +43,7 @@ See `git-update/README.md` for the full option schema with MQTT credentials, SSL
    ```bash
    pip install -r git-update/rootfs/app/requirements.txt
    ```
-3. Copy `dev/options.json` (to be created) into `/data/options.json` when running locally or export `ADDON_DEV_OPTIONS` pointing to a JSON file. The Python service automatically falls back to `./dev/options.json` for local runs.
+3. Copy `dev/options.json` (to be created) into `/data/options.json` when running locally or export `ADDON_DEV_OPTIONS` pointing to a JSON file. The Python service automatically falls back to `./dev/options.json` for local runs. You can override the default `/data` directories by setting `GIT_UPDATE_STATE_DIR` and `GIT_UPDATE_REPO_DIR` to any writable path on your workstation.
 4. Run the service locally:
    ```bash
    uvicorn git_update.api:create_app --reload --port 7999
@@ -53,11 +53,11 @@ See `git-update/README.md` for the full option schema with MQTT credentials, SSL
 ## GitHub Repository
 Once you are ready to publish:
 1. Initialize Git: `git init && git add . && git commit -m "Initial scaffold"`.
-2. Create the `Git-Update` repository on GitHub.
+2. Create (or reuse) the `HA_GITUpdate` repository on GitHub.
 3. Link remotes and push:
    ```bash
    git branch -M main
-   git remote add origin https://github.com/<your-user>/Git-Update.git
+   git remote add origin https://github.com/wolfgangbures/HA_GITUpdate.git
    git push -u origin main
    ```
 

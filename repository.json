@@ -1,8 +1,8 @@
 {
   "name": "Git Update Add-on Repository",
-  "url": "https://github.com/USERNAME/Git-Update",
-  "maintainer": "Your Name <you@example.com>",
-  "source": "https://github.com/USERNAME/Git-Update",
+  "url": "https://github.com/wolfgangbures/HA_GITUpdate",
+  "maintainer": "Wolfgang Bures",
+  "source": "https://github.com/wolfgangbures/HA_GITUpdate",
   "arch": ["amd64", "aarch64", "armv7", "armhf", "i386"],
   "homeassistant": "2024.12.0"
 }
