@@ -1,0 +1,2 @@
+*.sh text eol=lf
+git-update/rootfs/etc/services.d/git-update/run text eol=lf

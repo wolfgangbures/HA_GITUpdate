@@ -1,0 +1,8 @@
+{
+  "name": "Git Update Add-on Repository",
+  "url": "https://github.com/USERNAME/Git-Update",
+  "maintainer": "Your Name <you@example.com>",
+  "source": "https://github.com/USERNAME/Git-Update",
+  "arch": ["amd64", "aarch64", "armv7", "armhf", "i386"],
+  "homeassistant": "2024.12.0"
+}

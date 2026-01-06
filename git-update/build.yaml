@@ -1,0 +1,8 @@
+build_from:
+  amd64: ghcr.io/home-assistant/amd64-addon-base-python:3.12
+  aarch64: ghcr.io/home-assistant/aarch64-addon-base-python:3.12
+  armv7: ghcr.io/home-assistant/armv7-addon-base-python:3.12
+  armhf: ghcr.io/home-assistant/armhf-addon-base-python:3.12
+  i386: ghcr.io/home-assistant/i386-addon-base-python:3.12
+args:
+  PYTHON_VERSION: "3.12"

@@ -1,0 +1,30 @@
+# Home Assistant add-on artifacts
+/data/
+dev/
+!dev/options.example.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.sqlite
+.env
+.venv
+venv/
+.dev/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs & coverage
+*.log
+coverage/
+htmlcov/
+.pytest_cache/
+.prof

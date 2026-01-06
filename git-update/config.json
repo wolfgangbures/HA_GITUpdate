@@ -1,0 +1,64 @@
+{
+  "name": "Git Update",
+  "slug": "git_update",
+  "version": "0.1.0",
+  "description": "Keeps a Git repository in sync and notifies Home Assistant about changed files.",
+  "url": "https://github.com/USERNAME/Git-Update",
+  "arch": ["amd64", "aarch64", "armv7", "armhf", "i386"],
+  "startup": "services",
+  "boot": "auto",
+  "map": ["share:rw", "ssl"],
+  "init": false,
+  "homeassistant": "2024.12.0",
+  "panel_icon": "mdi:github",
+  "panel_title": "Git Update",
+  "ports": {
+    "7999/tcp": 7999
+  },
+  "ports_description": {
+    "7999/tcp": "FastAPI management endpoint"
+  },
+  "ports_optional": {
+    "7999/tcp": true
+  },
+  "schema": {
+    "repo_url": "str",
+    "branch": "str?",
+    "access_token": "str?",
+    "poll_interval": "int",
+    "git_depth": "int",
+    "ha_event_name": "str",
+    "notify_on_startup": "bool",
+    "verify_ssl": "bool",
+    "log_level": "list(trace|debug|info|warning|error)",
+    "mqtt_enabled": "bool",
+    "mqtt_topic": "str",
+    "mqtt_host": "str?",
+    "mqtt_port": "int?",
+    "mqtt_username": "str?",
+    "mqtt_password": "str?",
+    "mqtt_qos": "int?",
+    "mqtt_retain": "bool",
+    "http_api_port": "int"
+  },
+  "options": {
+    "repo_url": "https://github.com/home-assistant/core.git",
+    "branch": "main",
+    "access_token": "",
+    "poll_interval": 300,
+    "git_depth": 1,
+    "ha_event_name": "git_update.files_changed",
+    "notify_on_startup": true,
+    "verify_ssl": true,
+    "log_level": "info",
+    "mqtt_enabled": false,
+    "mqtt_topic": "homeassistant/git_update",
+    "mqtt_host": "core-mosquitto",
+    "mqtt_port": 1883,
+    "mqtt_username": "",
+    "mqtt_password": "",
+    "mqtt_qos": 1,
+    "mqtt_retain": false,
+    "http_api_port": 7999
+  }
+}
