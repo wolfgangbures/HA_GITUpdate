@@ -21,7 +21,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY rootfs / 
 
-RUN pip install --upgrade pip && \
+RUN chmod a+x /etc/cont-init.d/*.sh && \
+    chmod a+x /etc/services.d/*/run && \
+    pip install --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt
 
 CMD ["/init"]
