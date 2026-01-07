@@ -3,6 +3,8 @@
   "branch": "main",
   "access_token": "",
   "ha_access_token": "",
+  "ha_base_url": "http://homeassistant:8123",
+  "ha_verify_ssl": true,
   "poll_interval": 300,
   "git_depth": 1,
   "ha_event_name": "git_update.files_changed",

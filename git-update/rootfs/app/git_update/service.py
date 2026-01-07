@@ -74,6 +74,8 @@ class GitUpdateService:
         data = self.options.model_dump()
         data.pop("access_token", None)
         data.pop("ha_access_token", None)
+        if data.get("ha_base_url"):
+            data["ha_base_url"] = "***redacted***"
         data.pop("mqtt_password", None)
         return data
 

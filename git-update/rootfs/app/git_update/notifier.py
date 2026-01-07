@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 class Notifier:
     def __init__(self, options: Options) -> None:
         self._options = options
-        self._ha = HAEventClient(options.ha_event_name, options.ha_access_token)
+        self._ha = HAEventClient(options)
         self._mqtt_settings = options.mqtt()
         self._mqtt = MqttPublisher(self._mqtt_settings)
 

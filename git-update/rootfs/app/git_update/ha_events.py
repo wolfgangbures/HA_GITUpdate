@@ -6,32 +6,48 @@ from typing import Any
 
 import httpx
 
+from .config import Options
+
 _LOGGER = logging.getLogger(__name__)
 SUPERVISOR_API = os.getenv("SUPERVISOR_API", "http://supervisor")
 SUPERVISOR_TOKEN_ENV = os.getenv("SUPERVISOR_TOKEN")
 
 
 class HAEventClient:
-    def __init__(self, event_name: str, fallback_token: str | None = None) -> None:
-        self._event_name = event_name
-        self._token = SUPERVISOR_TOKEN_ENV or fallback_token
-        if not self._token:
-            logging.getLogger(__name__).warning(
+    def __init__(self, options: Options) -> None:
+        self._event_name = options.ha_event_name
+        self._supervisor_token = SUPERVISOR_TOKEN_ENV
+        self._fallback_token = options.ha_access_token or None
+        self._base_url = (options.ha_base_url or "http://homeassistant:8123").rstrip("/")
+        self._verify_ssl = options.ha_verify_ssl
+
+        if self._supervisor_token:
+            _LOGGER.debug("Using Supervisor token for HA events")
+        elif self._fallback_token:
+            _LOGGER.info("Using configured HA token for event emission via %s", self._base_url)
+        else:
+            _LOGGER.warning(
                 "No Supervisor or configured HA token available; event emission disabled."
             )
-        elif fallback_token and not SUPERVISOR_TOKEN_ENV:
-            logging.getLogger(__name__).info(
-                "Using configured Home Assistant token for event emission."
-            )
-        self._client = httpx.AsyncClient(timeout=20)
+
+        self._client = httpx.AsyncClient(timeout=20, verify=self._verify_ssl)
 
     async def fire_event(self, payload: dict[str, Any]) -> None:
-        if not self._token:
+        token: str | None
+        url: str
+
+        if self._supervisor_token:
+            token = self._supervisor_token
+            url = f"{SUPERVISOR_API}/core/api/events/{self._event_name}"
+        elif self._fallback_token:
+            token = self._fallback_token
+            url = f"{self._base_url}/api/events/{self._event_name}"
+        else:
             _LOGGER.warning("HA token unavailable, skipping event emission")
             return
-        url = f"{SUPERVISOR_API}/core/api/events/{self._event_name}"
+
         headers = {
-            "Authorization": f"Bearer {self._token}",
+            "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
         }
         resp = await self._client.post(url, json=payload, headers=headers)

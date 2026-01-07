@@ -9,6 +9,8 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `branch` | Branch or ref to check out. Defaults to `main`. |
 | `access_token` | Token injected into HTTPS URLs for private repositories. Leave blank for anonymous access. |
 | `ha_access_token` | Optional long-lived Home Assistant token when Supervisor token is unavailable. |
+| `ha_base_url` | Base URL used when emitting events with `ha_access_token` (e.g. `http://homeassistant:8123`). |
+| `ha_verify_ssl` | Whether to verify TLS certificates when using `ha_base_url`. |
 | `poll_interval` | Sync interval in seconds (minimum 60 recommended). |
 | `git_depth` | Shallow-clone depth. Set to `0` for full history. |
 | `ha_event_name` | Supervisor event fired after changes are discovered. |

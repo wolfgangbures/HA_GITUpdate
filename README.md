@@ -30,11 +30,13 @@ Git-Update is a Home Assistant add-on that keeps a local working copy of any Git
 | `branch` | Branch or ref to track | `main` |
 | `access_token` | Personal access token for private repos | empty |
 | `ha_access_token` | Optional Home Assistant long-lived token fallback | empty |
+| `ha_base_url` | Base URL when using `ha_access_token` | `http://homeassistant:8123` |
 | `poll_interval` | Sync interval in seconds | `300` |
 | `ha_event_name` | Event name fired via Supervisor| `git_update.files_changed` |
 | `notify_on_startup` | Emit notification after first sync | `true` |
 | `mqtt_enabled` | Toggle MQTT notifications | `false` |
 | `mqtt_topic` | Topic to publish change payloads | `homeassistant/git_update` |
+| `ha_verify_ssl` | Verify TLS when calling Home Assistant via `ha_base_url` | `true` |
 
 See `git-update/README.md` for the full option schema with MQTT credentials, SSL verification, and log level controls.
 

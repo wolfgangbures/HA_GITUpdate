@@ -30,6 +30,8 @@ class Options(BaseModel):
     branch: str = "main"
     access_token: str | None = None
     ha_access_token: str | None = None
+    ha_base_url: str | None = None
+    ha_verify_ssl: bool = True
     poll_interval: PositiveInt = 300
     git_depth: int = Field(default=1, ge=0)
     ha_event_name: str = "git_update.files_changed"
