@@ -29,6 +29,7 @@ Git-Update is a Home Assistant add-on that keeps a local working copy of any Git
 | `repo_url` | Git repository to mirror | `https://github.com/home-assistant/core.git` |
 | `branch` | Branch or ref to track | `main` |
 | `access_token` | Personal access token for private repos | empty |
+| `ha_access_token` | Optional Home Assistant long-lived token fallback | empty |
 | `poll_interval` | Sync interval in seconds | `300` |
 | `ha_event_name` | Event name fired via Supervisor| `git_update.files_changed` |
 | `notify_on_startup` | Emit notification after first sync | `true` |

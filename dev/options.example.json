@@ -1,0 +1,21 @@
+{
+  "repo_url": "https://github.com/home-assistant/core.git",
+  "branch": "main",
+  "access_token": "",
+  "ha_access_token": "",
+  "poll_interval": 300,
+  "git_depth": 1,
+  "ha_event_name": "git_update.files_changed",
+  "notify_on_startup": true,
+  "verify_ssl": true,
+  "log_level": "info",
+  "mqtt_enabled": false,
+  "mqtt_topic": "homeassistant/git_update",
+  "mqtt_host": "core-mosquitto",
+  "mqtt_port": 1883,
+  "mqtt_username": "",
+  "mqtt_password": "",
+  "mqtt_qos": 1,
+  "mqtt_retain": false,
+  "http_api_port": 7999
+}

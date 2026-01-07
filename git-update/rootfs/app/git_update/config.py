@@ -29,6 +29,7 @@ class Options(BaseModel):
     repo_url: str
     branch: str = "main"
     access_token: str | None = None
+    ha_access_token: str | None = None
     poll_interval: PositiveInt = 300
     git_depth: int = Field(default=1, ge=0)
     ha_event_name: str = "git_update.files_changed"

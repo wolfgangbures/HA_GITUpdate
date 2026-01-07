@@ -73,6 +73,7 @@ class GitUpdateService:
     def public_config(self) -> dict[str, Any]:
         data = self.options.model_dump()
         data.pop("access_token", None)
+        data.pop("ha_access_token", None)
         data.pop("mqtt_password", None)
         return data
 

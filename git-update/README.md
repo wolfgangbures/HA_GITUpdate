@@ -8,6 +8,7 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `repo_url` *(required)* | HTTPS or SSH URL of the repository to follow. |
 | `branch` | Branch or ref to check out. Defaults to `main`. |
 | `access_token` | Token injected into HTTPS URLs for private repositories. Leave blank for anonymous access. |
+| `ha_access_token` | Optional long-lived Home Assistant token when Supervisor token is unavailable. |
 | `poll_interval` | Sync interval in seconds (minimum 60 recommended). |
 | `git_depth` | Shallow-clone depth. Set to `0` for full history. |
 | `ha_event_name` | Supervisor event fired after changes are discovered. |
@@ -21,7 +22,7 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `mqtt_qos`, `mqtt_retain` | Delivery controls for MQTT messages. |
 | `http_api_port` | Exposes the management REST API. Disable (set to `0`) to turn off the listener. |
 
-> Ensure the add-on manifest includes `homeassistant_api: true` so the Supervisor injects `SUPERVISOR_TOKEN` and the service can fire Home Assistant events.
+> Ensure the add-on manifest includes `homeassistant_api: true` so the Supervisor injects `SUPERVISOR_TOKEN`. If your environment does not provide that token, set `ha_access_token` to a long-lived access token created in your Home Assistant user profile.
 
 ### MQTT Payload
 ```json
