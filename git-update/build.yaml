@@ -1,8 +1,8 @@
 build_from:
-  amd64: homeassistant/amd64-base:3.20
-  aarch64: homeassistant/aarch64-base:3.20
-  armv7: homeassistant/armv7-base:3.20
-  armhf: homeassistant/armhf-base:3.20
-  i386: homeassistant/i386-base:3.20
+  amd64: alpine:3.20
+  aarch64: alpine:3.20
+  armv7: alpine:3.20
+  armhf: alpine:3.20
+  i386: alpine:3.20
 args:
   PYTHON_VERSION: "3.12"
