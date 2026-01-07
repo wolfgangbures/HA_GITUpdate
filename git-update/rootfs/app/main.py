@@ -18,6 +18,13 @@ logging.basicConfig(
 
 async def main() -> None:
     service = GitUpdateService()
+    logging.getLogger(__name__).info(
+        "Git Update service starting", extra={
+            "version": "0.1.0",
+            "repo_url": service.options.repo_url,
+            "branch": service.options.branch,
+        }
+    )
     app = create_app(service)
     http_port = service.options.http_api_port
     server: uvicorn.Server | None = None

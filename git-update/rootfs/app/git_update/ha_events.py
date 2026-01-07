@@ -9,6 +9,10 @@ import httpx
 _LOGGER = logging.getLogger(__name__)
 SUPERVISOR_API = os.getenv("SUPERVISOR_API", "http://supervisor")
 TOKEN = os.getenv("SUPERVISOR_TOKEN")
+if not TOKEN:
+    logging.getLogger(__name__).error(
+        "SUPERVISOR_TOKEN missing. Enable homeassistant_api in config or restart the add-on after granting access."
+    )
 
 
 class HAEventClient:
