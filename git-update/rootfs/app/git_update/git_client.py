@@ -76,7 +76,16 @@ class GitRepoManager:
             fetch_kwargs["depth"] = self._depth_arg
         origin.fetch(branch, **fetch_kwargs)
         repo.git.checkout(branch)
-        origin.pull(branch)
+        try:
+            repo.git.pull("--ff-only", "origin", branch)
+        except git.GitCommandError as exc:
+            _LOGGER.warning(
+                "Fast-forward pull failed (%s). Resetting to origin/%s",
+                exc,
+                branch,
+            )
+            origin.fetch(branch, force=True, **fetch_kwargs)
+            repo.git.reset("--hard", f"origin/{branch}")
         after = self._safe_head(repo)
         changes = self._collect_changes(repo, before, after)
         return GitSyncResult(before, after, branch, changes)
