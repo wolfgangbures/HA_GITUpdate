@@ -20,9 +20,11 @@ logging.basicConfig(
 
 async def main() -> None:
     service = GitUpdateService()
+    build_version = os.getenv("ADDON_BUILD_VERSION", "dev")
     logging.getLogger(__name__).info(
-        "Git Update service starting | version=%s | repo=%s | branch=%s",
+        "Git Update service starting | version=%s | build=%s | repo=%s | branch=%s",
         __VERSION__,
+        build_version,
         service.options.repo_url,
         service.options.branch,
     )
