@@ -21,6 +21,8 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `mqtt_qos`, `mqtt_retain` | Delivery controls for MQTT messages. |
 | `http_api_port` | Exposes the management REST API. Disable (set to `0`) to turn off the listener. |
 
+> Ensure the add-on manifest includes `homeassistant_api: true` so the Supervisor injects `SUPERVISOR_TOKEN` and the service can fire Home Assistant events.
+
 ### MQTT Payload
 ```json
 {
