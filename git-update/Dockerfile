@@ -21,9 +21,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY rootfs / 
 
-RUN chmod a+x /etc/cont-init.d/*.sh && \
-    chmod a+x /etc/services.d/*/run && \
+RUN mkdir -p /data/state /data/repo && \
+    chmod 700 /data/state /data/repo && \
     pip install --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt
 
-CMD ["/init"]
+WORKDIR /app
+
+CMD ["python3", "main.py"]
