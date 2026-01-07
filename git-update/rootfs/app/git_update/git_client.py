@@ -33,18 +33,25 @@ class GitRepoManager:
         if self._repo is not None:
             return self._repo
         if self._repo_dir.exists():
-            self._repo = git.Repo(self._repo_dir)
-        else:
-            self._repo_dir.mkdir(parents=True, exist_ok=True)
-            _LOGGER.info("Cloning %s", self._options.repo_url)
-            clone_kwargs: dict[str, object] = {"branch": self._options.branch}
-            if self._depth_arg:
-                clone_kwargs["depth"] = self._depth_arg
-            self._repo = git.Repo.clone_from(
-                self._auth_repo_url,
-                self._repo_dir,
-                **clone_kwargs,
-            )
+            if (self._repo_dir / ".git").exists():
+                self._repo = git.Repo(self._repo_dir)
+                return self._repo
+            if any(self._repo_dir.iterdir()):
+                raise RuntimeError(
+                    f"Existing directory {self._repo_dir} is not a Git repository"
+                )
+            self._repo_dir.rmdir()
+
+        self._repo_dir.parent.mkdir(parents=True, exist_ok=True)
+        _LOGGER.info("Cloning %s", self._options.repo_url)
+        clone_kwargs: dict[str, object] = {"branch": self._options.branch}
+        if self._depth_arg:
+            clone_kwargs["depth"] = self._depth_arg
+        self._repo = git.Repo.clone_from(
+            self._auth_repo_url,
+            self._repo_dir,
+            **clone_kwargs,
+        )
         return self._repo
 
     @property
