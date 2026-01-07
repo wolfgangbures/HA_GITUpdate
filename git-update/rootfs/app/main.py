@@ -10,6 +10,8 @@ import uvicorn
 from git_update.api import create_app
 from git_update.service import GitUpdateService
 
+__VERSION__ = "0.1.0"
+
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
@@ -19,11 +21,10 @@ logging.basicConfig(
 async def main() -> None:
     service = GitUpdateService()
     logging.getLogger(__name__).info(
-        "Git Update service starting", extra={
-            "version": "0.1.0",
-            "repo_url": service.options.repo_url,
-            "branch": service.options.branch,
-        }
+        "Git Update service starting | version=%s | repo=%s | branch=%s",
+        __VERSION__,
+        service.options.repo_url,
+        service.options.branch,
     )
     app = create_app(service)
     http_port = service.options.http_api_port
