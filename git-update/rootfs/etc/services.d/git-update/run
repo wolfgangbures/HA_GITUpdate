@@ -1,5 +1,0 @@
-#!/command/with-contenv sh
-if [ -f /data/options.json ]; then
-  export ADDON_OPTIONS_FILE=/data/options.json
-fi
-exec s6-setuidgid root python3 /app/main.py
