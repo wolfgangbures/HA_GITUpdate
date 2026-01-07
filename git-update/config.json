@@ -1,7 +1,7 @@
 {
   "name": "Git Update",
   "slug": "git_update",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Keeps a Git repository in sync and notifies Home Assistant about changed files.",
   "url": "https://github.com/wolfgangbures/HA_GITUpdate",
   "arch": ["amd64", "aarch64", "armv7", "armhf", "i386"],
