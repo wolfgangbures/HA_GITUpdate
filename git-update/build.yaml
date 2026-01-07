@@ -1,8 +1,8 @@
 build_from:
-  amd64: ghcr.io/home-assistant/amd64-addon-base:17.2.0
-  aarch64: ghcr.io/home-assistant/aarch64-addon-base:17.2.0
-  armv7: ghcr.io/home-assistant/armv7-addon-base:17.2.0
-  armhf: ghcr.io/home-assistant/armhf-addon-base:17.2.0
-  i386: ghcr.io/home-assistant/i386-addon-base:17.2.0
+  amd64: homeassistant/amd64-base:3.20
+  aarch64: homeassistant/aarch64-base:3.20
+  armv7: homeassistant/armv7-base:3.20
+  armhf: homeassistant/armhf-base:3.20
+  i386: homeassistant/i386-base:3.20
 args:
   PYTHON_VERSION: "3.12"
