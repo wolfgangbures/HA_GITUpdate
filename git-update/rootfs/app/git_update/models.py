@@ -19,6 +19,7 @@ class SyncMetadata(BaseModel):
     changes: list[FileChange] = Field(default_factory=list)
     synced_at: datetime
     reason: str
+    initial_sync: bool = False
 
 
 class StatusResponse(BaseModel):

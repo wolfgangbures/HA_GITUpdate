@@ -19,6 +19,7 @@ class GitSyncResult:
     after: str | None
     branch: str
     changes: list[FileChange]
+    initial: bool = False
 
 
 class GitRepoManager:
@@ -76,6 +77,7 @@ class GitRepoManager:
             fetch_kwargs["depth"] = self._depth_arg
         origin.fetch(branch, **fetch_kwargs)
         repo.git.checkout(branch)
+        initial = before is None
         try:
             repo.git.pull("--ff-only", "origin", branch)
         except git.GitCommandError as exc:
@@ -87,8 +89,11 @@ class GitRepoManager:
             origin.fetch(branch, force=True, **fetch_kwargs)
             repo.git.reset("--hard", f"origin/{branch}")
         after = self._safe_head(repo)
-        changes = self._collect_changes(repo, before, after)
-        return GitSyncResult(before, after, branch, changes)
+        if initial and after:
+            changes = self._collect_all_files(repo)
+        else:
+            changes = self._collect_changes(repo, before, after)
+        return GitSyncResult(before, after, branch, changes, initial)
 
     def _collect_changes(
         self, repo: git.Repo, before: str | None, after: str | None
@@ -119,6 +124,15 @@ class GitRepoManager:
             "D": "deleted",
         }
         return mapping.get(status, "modified")
+
+    @staticmethod
+    def _collect_all_files(repo: git.Repo) -> list[FileChange]:
+        tree = repo.git.ls_tree("-r", "HEAD", "--name-only")
+        return [
+            FileChange(path=line.strip(), change_type="added")
+            for line in tree.splitlines()
+            if line.strip()
+        ]
 
     @staticmethod
     def _safe_head(repo: git.Repo) -> str | None:

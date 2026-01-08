@@ -6,8 +6,9 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .config import Options, load_options
+from .deployer import DeploymentError, FileDeployer
 from .git_client import GitRepoManager
-from .models import FileChange, StatusResponse, SyncMetadata
+from .models import StatusResponse, SyncMetadata
 from .notifier import Notifier
 
 _LOGGER = logging.getLogger(__name__)
@@ -17,6 +18,7 @@ class GitUpdateService:
     def __init__(self, options: Options | None = None) -> None:
         self.options = options or load_options()
         self.repo = GitRepoManager(self.options)
+        self.deployer = FileDeployer(self.options)
         self.notifier = Notifier(self.options)
         self.status = StatusResponse(healthy=True, last_sync=None, pending_reason=None, error=None)
         self._sync_lock = asyncio.Lock()
@@ -54,7 +56,20 @@ class GitUpdateService:
                 changes=result.changes,
                 synced_at=datetime.now(timezone.utc),
                 reason=reason,
+                initial_sync=result.initial,
             )
+            if result.changes:
+                try:
+                    await asyncio.to_thread(self.deployer.deploy, result.changes)
+                except DeploymentError as exc:
+                    _LOGGER.error("Deployment failed: %s", exc)
+                    self.status = StatusResponse(
+                        healthy=False,
+                        last_sync=metadata,
+                        pending_reason=None,
+                        error=str(exc),
+                    )
+                    return
             self.status = StatusResponse(healthy=True, last_sync=metadata, pending_reason=None, error=None)
             should_notify = bool(result.changes) or (
                 self.options.notify_on_startup and reason == "startup"

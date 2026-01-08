@@ -11,6 +11,7 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `ha_access_token` | Optional long-lived Home Assistant token when Supervisor token is unavailable. |
 | `ha_base_url` | Base URL used when emitting events with `ha_access_token` (e.g. `http://homeassistant:8123`). |
 | `ha_verify_ssl` | Whether to verify TLS certificates when using `ha_base_url`. |
+| `target_path` | Root directory where changed files are copied (defaults to `/config`). |
 | `poll_interval` | Sync interval in seconds (minimum 60 recommended). |
 | `git_depth` | Shallow-clone depth. Set to `0` for full history. |
 | `ha_event_name` | Supervisor event fired after changes are discovered. |
@@ -25,6 +26,14 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `http_api_port` | Exposes the management REST API. Disable (set to `0`) to turn off the listener. |
 
 > Ensure the add-on manifest includes `homeassistant_api: true` so the Supervisor injects `SUPERVISOR_TOKEN`. If your environment does not provide that token, set `ha_access_token` to a long-lived access token created in your Home Assistant user profile.
+
+All YAML files are validated before deployment. Invalid documents block the notification and surface the parser error in the add-on logs.
+
+## Deployment Flow
+- The repository is cloned into the add-on data directory (`/data/repo`).
+- After each sync, changed files are copied into `target_path` (default `/config`).
+- Deletions and renames are mirrored, removing obsolete files in the destination.
+- Only after a successful deployment are Home Assistant events and MQTT messages emitted.
 
 ### MQTT Payload
 ```json
@@ -50,7 +59,7 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 ## Local Development
 1. Install Python 3.12 and create a virtual environment.
 2. Install requirements from `rootfs/app/requirements.txt`.
-3. Create `dev/options.json` that mirrors the add-on schema.
+3. Create `dev/options.json` that mirrors the add-on schema, including a writable `target_path`.
 4. Run `python git-update/rootfs/app/main.py` to start the scheduler and API locally.
 
 ## Release Process
