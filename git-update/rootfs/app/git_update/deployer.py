@@ -87,4 +87,3 @@ class FileDeployer:
             path.relative_to(self._repo_dir)
         except ValueError as exc:
             raise DeploymentError(f"Unsafe repository path {path}") from exc
-*** End Patch
