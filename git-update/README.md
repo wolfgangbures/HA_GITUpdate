@@ -29,6 +29,40 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 
 All YAML files are validated before deployment. Invalid documents block the notification and surface the parser error in the add-on logs.
 
+After deployment, Home Assistant configuration is validated via the `check_config` service. If validation fails, an error event is fired instead of the success notification.
+
+## Events
+
+### Success Event: `{ha_event_name}`
+Fired after successful sync, deployment, and HA config validation.
+
+Payload:
+```json
+{
+  "event": "git_update.files_changed",
+  "branch": "main",
+  "commit": "abc123",
+  "reason": "scheduled",
+  "changes": [{"path": "config.yaml", "change_type": "modified"}],
+  "synced_at": "2026-01-09T12:00:00Z"
+}
+```
+
+### Error Event: `{ha_event_name}.error`
+Fired when deployment or HA config validation fails.
+
+Payload:
+```json
+{
+  "event": "git_update.files_changed.error",
+  "error_type": "config_validation_error",
+  "error_message": "Home Assistant configuration invalid: ...",
+  "branch": "main",
+  "commit": "abc123",
+  "timestamp": "2026-01-09T12:00:00Z"
+}
+```
+
 ## Deployment Flow
 - The repository is cloned into the add-on data directory (`/data/repo`).
 - After each sync, changed files are copied into `target_path` (default `/config`).

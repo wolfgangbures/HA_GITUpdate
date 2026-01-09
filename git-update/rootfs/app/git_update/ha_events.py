@@ -32,6 +32,29 @@ class HAEventClient:
 
         self._client = httpx.AsyncClient(timeout=20, verify=self._verify_ssl)
 
+    async def check_config(self) -> dict[str, Any]:
+        """Check Home Assistant configuration validity."""
+        token: str | None
+        url: str
+
+        if self._supervisor_token:
+            token = self._supervisor_token
+            url = f"{SUPERVISOR_API}/core/api/services/homeassistant/check_config"
+        elif self._fallback_token:
+            token = self._fallback_token
+            url = f"{self._base_url}/api/services/homeassistant/check_config"
+        else:
+            _LOGGER.warning("HA token unavailable, skipping config check")
+            return {"result": "skipped", "errors": None}
+
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        }
+        resp = await self._client.post(url, json={}, headers=headers)
+        resp.raise_for_status()
+        return resp.json()
+
     async def fire_event(self, payload: dict[str, Any]) -> None:
         token: str | None
         url: str

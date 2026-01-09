@@ -44,5 +44,31 @@ class Notifier:
             )
         )
 
+    async def notify_error(
+        self,
+        error_type: str,
+        error_message: str,
+        branch: str,
+        commit: str | None,
+    ) -> None:
+        """Fire error event for deployment/validation failures."""
+        payload = {
+            "event": f"{self._options.ha_event_name}.error",
+            "error_type": error_type,
+            "error_message": error_message,
+            "branch": branch,
+            "commit": commit,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        await self._ha.fire_event(payload)
+        await self._mqtt.publish(
+            MqttPayload(
+                topic=f"{self._mqtt_settings.topic}/error",
+                payload=payload,
+                qos=self._mqtt_settings.qos,
+                retain=self._mqtt_settings.retain,
+            )
+        )
+
     async def aclose(self) -> None:
         await self._ha.aclose()

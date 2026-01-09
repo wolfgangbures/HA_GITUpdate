@@ -10,7 +10,7 @@ import uvicorn
 from git_update.api import create_app
 from git_update.service import GitUpdateService
 
-__VERSION__ = "0.2.0"
+__VERSION__ = "0.3.0"
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),

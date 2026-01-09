@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0
+- Added Home Assistant configuration validation after deployment.
+- Fire error events when deployment or HA config validation fails.
+- Error events use `{event_name}.error` and include error type and message.
+
 ## v0.2.0
 - Added configurable deployment target path and copy changed files before emitting notifications.
 - Validate YAML documents prior to deployment to prevent broken Home Assistant configuration updates.
