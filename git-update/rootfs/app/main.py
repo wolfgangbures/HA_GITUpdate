@@ -8,18 +8,26 @@ import signal
 import uvicorn
 
 from git_update.api import create_app
+from git_update.config import load_options
 from git_update.service import GitUpdateService
 
 __VERSION__ = "0.3.0"
 
-logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-)
-
 
 async def main() -> None:
-    service = GitUpdateService()
+    options = load_options()
+    log_level_map = {
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warning": logging.WARNING,
+        "error": logging.ERROR,
+    }
+    logging.basicConfig(
+        level=log_level_map.get(options.log_level.lower(), logging.INFO),
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    )
+    
+    service = GitUpdateService(options)
     build_version = os.getenv("ADDON_BUILD_VERSION", "dev")
     logging.getLogger(__name__).info(
         "Git Update service starting | version=%s | build=%s | repo=%s | branch=%s",

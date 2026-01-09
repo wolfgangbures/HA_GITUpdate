@@ -38,7 +38,7 @@ class Options(BaseModel):
     ha_event_name: str = "git_update.files_changed"
     notify_on_startup: bool = True
     verify_ssl: bool = True
-    log_level: str = Field(default="info", pattern=r"^(trace|debug|info|warning|error)$")
+    log_level: str = Field(default="info", pattern=r"^(debug|info|warning|error)$")
     http_api_port: int = DEFAULT_HTTP_PORT
     mqtt_enabled: bool = False
     mqtt_topic: str = "homeassistant/git_update"

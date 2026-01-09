@@ -17,7 +17,7 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `ha_event_name` | Supervisor event fired after changes are discovered. |
 | `notify_on_startup` | Emit a notification after the first successful sync. |
 | `verify_ssl` | Toggle TLS verification for HTTPS remotes. |
-| `log_level` | Logging verbosity (`trace`, `debug`, `info`, `warning`, `error`). |
+| `log_level` | Logging verbosity (`debug`, `info`, `warning`, `error`). |
 | `mqtt_enabled` | Publish change payloads to MQTT. |
 | `mqtt_topic` | MQTT topic for change payloads. |
 | `mqtt_host`, `mqtt_port` | Broker connection overrides (defaults to `core-mosquitto:1883`). |
