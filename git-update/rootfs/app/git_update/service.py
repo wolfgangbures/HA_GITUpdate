@@ -78,27 +78,24 @@ class GitUpdateService:
                     return
 
                 # Validate Home Assistant configuration
-                try:
-                    check_result = await self.notifier._ha.check_config()
-                    if check_result.get("result") == "invalid":
-                        errors = check_result.get("errors", "Unknown validation error")
-                        error_msg = f"Home Assistant configuration invalid: {errors}"
-                        _LOGGER.error(error_msg)
-                        await self.notifier.notify_error(
-                            "config_validation_error",
-                            error_msg,
-                            result.branch,
-                            result.after,
-                        )
-                        self.status = StatusResponse(
-                            healthy=False,
-                            last_sync=metadata,
-                            pending_reason=None,
-                            error=error_msg,
-                        )
-                        return
-                except Exception as exc:  # noqa: BLE001
-                    _LOGGER.warning("Config check failed: %s; proceeding anyway", exc)
+                check_result = await self.notifier._ha.check_config()
+                if check_result is not None and check_result:
+                    # Non-empty response means validation errors
+                    error_msg = f"Home Assistant configuration invalid: {check_result}"
+                    _LOGGER.error(error_msg)
+                    await self.notifier.notify_error(
+                        "config_validation_error",
+                        error_msg,
+                        result.branch,
+                        result.after,
+                    )
+                    self.status = StatusResponse(
+                        healthy=False,
+                        last_sync=metadata,
+                        pending_reason=None,
+                        error=error_msg,
+                    )
+                    return
 
             self.status = StatusResponse(healthy=True, last_sync=metadata, pending_reason=None, error=None)
             should_notify = bool(result.changes) or (

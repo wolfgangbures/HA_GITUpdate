@@ -32,8 +32,12 @@ class HAEventClient:
 
         self._client = httpx.AsyncClient(timeout=20, verify=self._verify_ssl)
 
-    async def check_config(self) -> dict[str, Any]:
-        """Check Home Assistant configuration validity."""
+    async def check_config(self) -> Any:
+        """Check Home Assistant configuration validity.
+        
+        Returns the service call response (typically a list).
+        Empty list = valid config, non-empty = errors.
+        """
         token: str | None
         url: str
 
@@ -45,7 +49,7 @@ class HAEventClient:
             url = f"{self._base_url}/api/services/homeassistant/check_config"
         else:
             _LOGGER.warning("HA token unavailable, skipping config check")
-            return {"result": "skipped", "errors": None}
+            return None
 
         headers = {
             "Authorization": f"Bearer {token}",
