@@ -1,8 +1,8 @@
 build_from:
-  amd64: alpine:3.20
-  aarch64: alpine:3.20
-  armv7: alpine:3.20
-  armhf: alpine:3.20
-  i386: alpine:3.20
+  amd64: library/alpine:3.20
+  aarch64: library/alpine:3.20
+  armv7: library/alpine:3.20
+  armhf: library/alpine:3.20
+  i386: library/alpine:3.20
 args:
   PYTHON_VERSION: "3.12"

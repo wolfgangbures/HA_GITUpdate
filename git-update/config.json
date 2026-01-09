@@ -35,7 +35,7 @@
     "ha_event_name": "str",
     "notify_on_startup": "bool",
     "verify_ssl": "bool",
-    "log_level": "list(debug|info|warning|error)",
+    "log_level": "match(debug|info|warning|error)",
     "mqtt_enabled": "bool",
     "mqtt_topic": "str",
     "mqtt_host": "str?",
