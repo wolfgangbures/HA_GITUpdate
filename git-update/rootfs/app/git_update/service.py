@@ -98,6 +98,14 @@ class GitUpdateService:
                     return
 
             self.status = StatusResponse(healthy=True, last_sync=metadata, pending_reason=None, error=None)
+            
+            if result.changes:
+                _LOGGER.info("Sync completed: %d file(s) changed on branch %s @ %s", 
+                            len(result.changes), result.branch, result.after[:7] if result.after else "unknown")
+            else:
+                _LOGGER.debug("Sync completed: no changes detected on branch %s @ %s",
+                             result.branch, result.after[:7] if result.after else "unknown")
+            
             should_notify = bool(result.changes) or (
                 self.options.notify_on_startup and reason == "startup"
             )
