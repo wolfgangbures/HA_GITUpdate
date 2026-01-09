@@ -80,10 +80,9 @@ class GitRepoManager:
         initial = before is None
         try:
             repo.git.pull("--ff-only", "origin", branch)
-        except git.GitCommandError as exc:
+        except git.GitCommandError:
             _LOGGER.warning(
-                "Fast-forward pull failed (%s). Resetting to origin/%s",
-                exc,
+                "Fast-forward pull failed (divergent branches). Resetting to origin/%s",
                 branch,
             )
             origin.fetch(branch, force=True, **fetch_kwargs)
