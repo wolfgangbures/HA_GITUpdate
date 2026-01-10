@@ -2,6 +2,8 @@
 
 Git-Update is a Home Assistant add-on that keeps a local working copy of any Git repository synchronized and notifies Home Assistant whenever files change. The add-on exposes a lightweight HTTP API, emits Home Assistant events by default, and can optionally publish MQTT messages for additional automations.
 
+> This project (code and documentation) was generated with AI assistance using GitHub Copilot powered by GPT-5.1-Codex.
+
 ## Features
 - Scheduled Git fetch + pull with configurable interval and shallow clone depth
 - Hash-based change detection with per-file change types (added/modified/deleted/renamed)
