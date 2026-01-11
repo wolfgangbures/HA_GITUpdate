@@ -29,7 +29,7 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 
 All YAML files are validated before deployment. Invalid documents block the notification and surface the parser error in the add-on logs.
 
-After deployment, Home Assistant configuration is validated via the `check_config` service. If validation fails, an error event is fired instead of the success notification.
+After deployment, Home Assistant configuration is validated via the Supervisor `/core/check` endpoint (equivalent to `ha core check`) whenever the add-on runs under Home Assistant OS/Supervisor, so we wait for the final outcome before emitting success events. In standalone installs we fall back to the legacy `check_config` service. If validation fails, an error event is fired instead of the success notification.
 
 ## Events
 

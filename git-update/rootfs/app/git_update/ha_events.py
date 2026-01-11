@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import json
 from typing import Any
 
 import httpx
@@ -32,32 +33,85 @@ class HAEventClient:
 
         self._client = httpx.AsyncClient(timeout=20, verify=self._verify_ssl)
 
-    async def check_config(self) -> Any:
-        """Check Home Assistant configuration validity.
-        
-        Returns the service call response (typically a list).
-        Empty list = valid config, non-empty = errors.
+    async def check_config(self) -> tuple[bool | None, str | None]:
+        """Run `check_config` and wait for the outcome.
+
+        Returns a tuple of (is_valid, error_details). `is_valid` becomes `None`
+        when validation was skipped (e.g. no token available).
         """
-        token: str | None
-        url: str
 
         if self._supervisor_token:
-            token = self._supervisor_token
-            url = f"{SUPERVISOR_API}/core/api/services/homeassistant/check_config"
-        elif self._fallback_token:
-            token = self._fallback_token
-            url = f"{self._base_url}/api/services/homeassistant/check_config"
-        else:
-            _LOGGER.warning("HA token unavailable, skipping config check")
-            return None
+            return await self._check_config_via_supervisor()
+        if self._fallback_token:
+            return await self._check_config_via_service()
 
+        _LOGGER.warning("HA token unavailable, skipping config check")
+        return None, "missing_token"
+
+    async def _check_config_via_supervisor(self) -> tuple[bool, str | None]:
+        url = f"{SUPERVISOR_API}/core/check"
         headers = {
-            "Authorization": f"Bearer {token}",
+            "Authorization": f"Bearer {self._supervisor_token}",
             "Content-Type": "application/json",
         }
+
         resp = await self._client.post(url, json={}, headers=headers)
         resp.raise_for_status()
-        return resp.json()
+        payload = resp.json()
+        data = payload.get("data", payload)
+        result = data.get("result")
+        errors = self._stringify_errors(data.get("errors"))
+
+        if result == "valid":
+            return True, None
+        if result == "invalid":
+            return False, errors or "Unknown configuration error"
+
+        _LOGGER.warning("Unexpected response from /core/check: %s", data)
+        return False, errors or json.dumps(data)
+
+    async def _check_config_via_service(self) -> tuple[bool | None, str | None]:
+        # Fallback for non-supervisor environments where only the standard
+        # service call is available. The Home Assistant API responds once the
+        # check is complete, but some installations return a simple list.
+        url = f"{self._base_url}/api/services/homeassistant/check_config"
+        headers = {
+            "Authorization": f"Bearer {self._fallback_token}",
+            "Content-Type": "application/json",
+        }
+
+        resp = await self._client.post(url, json={}, headers=headers)
+        resp.raise_for_status()
+        data = resp.json()
+
+        if isinstance(data, list):
+            # Empty list == valid
+            return (not data), self._stringify_errors(data) if data else None
+
+        if isinstance(data, dict):
+            result = data.get("result")
+            errors = self._stringify_errors(data.get("errors") or data.get("message"))
+            if result == "valid":
+                return True, None
+            if result == "invalid":
+                return False, errors or "Unknown configuration error"
+            if errors:
+                return False, errors
+            return True, None
+
+        _LOGGER.warning("Unknown payload from check_config service: %s", data)
+        return None, self._stringify_errors(data)
+
+    @staticmethod
+    def _stringify_errors(value: Any) -> str | None:
+        if value in (None, ""):
+            return None
+        if isinstance(value, str):
+            return value
+        try:
+            return json.dumps(value, ensure_ascii=False)
+        except TypeError:
+            return str(value)
 
     async def fire_event(self, payload: dict[str, Any]) -> None:
         token: str | None

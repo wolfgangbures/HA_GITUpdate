@@ -77,11 +77,12 @@ class GitUpdateService:
                     )
                     return
 
-                # Validate Home Assistant configuration
-                check_result = await self.notifier._ha.check_config()
-                if check_result is not None and check_result:
-                    # Non-empty response means validation errors
-                    error_msg = f"Home Assistant configuration invalid: {check_result}"
+                # Validate Home Assistant configuration and wait for the outcome
+                is_valid, validation_error = await self.notifier._ha.check_config()
+                if is_valid is False:
+                    error_msg = "Home Assistant configuration invalid"
+                    if validation_error:
+                        error_msg = f"{error_msg}: {validation_error}"
                     _LOGGER.error(error_msg)
                     await self.notifier.notify_error(
                         "config_validation_error",
@@ -96,6 +97,11 @@ class GitUpdateService:
                         error=error_msg,
                     )
                     return
+                if is_valid is None:
+                    _LOGGER.warning(
+                        "Skipped Home Assistant config validation (reason=%s)",
+                        validation_error or "unknown",
+                    )
 
             self.status = StatusResponse(healthy=True, last_sync=metadata, pending_reason=None, error=None)
             
