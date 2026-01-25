@@ -7,8 +7,8 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | ------ | ----------- |
 | `repo_url` *(required)* | HTTPS or SSH URL of the repository to follow. |
 | `branch` | Branch or ref to check out. Defaults to `main`. |
-| `access_token` | Token injected into HTTPS URLs for private repositories. Leave blank for anonymous access. |
-| `ha_access_token` | Optional long-lived Home Assistant token when Supervisor token is unavailable. |
+| `access_token` | Token injected into HTTPS URLs for private repositories. Create a read-only PAT (e.g., GitHub > Settings > Developer settings > Personal access tokens > classic) with `repo` scope and paste it here. Leave blank for anonymous access. |
+| `ha_access_token` | Optional long-lived Home Assistant token when Supervisor token is unavailable. Generate it via your HA profile (Profile > Security > Long-Lived Access Tokens) and copy the full value into the add-on options. |
 | `ha_base_url` | Base URL used when emitting events with `ha_access_token` (e.g. `http://homeassistant:8123`). |
 | `ha_verify_ssl` | Whether to verify TLS certificates when using `ha_base_url`. |
 | `target_path` | Root directory where changed files are copied (defaults to `/config`). |
@@ -26,6 +26,10 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `http_api_port` | Exposes the management REST API. Disable (set to `0`) to turn off the listener. |
 
 > Ensure the add-on manifest includes `homeassistant_api: true` so the Supervisor injects `SUPERVISOR_TOKEN`. If your environment does not provide that token, set `ha_access_token` to a long-lived access token created in your Home Assistant user profile.
+
+### Obtaining Tokens
+1. **Git provider `access_token`**: Use your Git host's personal-access-token flow (for GitHub, visit *Settings > Developer settings > Personal access tokens > classic/new fine-grained*, select read-only scopes such as `repo:status`/`contents`, and copy the generated token into the add-on config). This PAT must remain secret and can be regenerated at any time if revoked.
+2. **Home Assistant `ha_access_token`**: In Home Assistant, open your user profile (lower-left avatar) and scroll to **Long-Lived Access Tokens**. Click *Create Token*, give it a name (e.g., "Git Update"), copy the value once shown, and store it in the add-on options. Delete and recreate the token whenever you rotate credentials or the add-on logs indicate the key expired.
 
 All YAML files are validated before deployment. Invalid documents block the notification and surface the parser error in the add-on logs.
 

@@ -41,9 +41,35 @@ class HAEventClient:
         """
 
         if self._supervisor_token:
-            return await self._check_config_via_supervisor()
+            try:
+                return await self._check_config_via_supervisor()
+            except httpx.HTTPStatusError as exc:
+                status = exc.response.status_code if exc.response else None
+                if status == 403:
+                    _LOGGER.error(
+                        "Supervisor denied /core/check (403). SUPERVISOR_TOKEN appears expired and must be refreshed."
+                    )
+                    if self._fallback_token:
+                        return await self._check_config_via_service()
+                    return None, "supervisor_forbidden"
+                if status == 401:
+                    _LOGGER.error(
+                        "Supervisor token rejected (401). Refresh the injected SUPERVISOR_TOKEN to continue validating configs."
+                    )
+                    return None, "supervisor_unauthorized"
+                raise
         if self._fallback_token:
-            return await self._check_config_via_service()
+            try:
+                return await self._check_config_via_service()
+            except httpx.HTTPStatusError as exc:
+                status = exc.response.status_code if exc.response else None
+                if status in {401, 403}:
+                    _LOGGER.error(
+                        "Home Assistant API token rejected (%s). Update the ha_access_token (long-lived user token) in the add-on options.",
+                        status,
+                    )
+                    return None, f"ha_api_{status}"
+                raise
 
         _LOGGER.warning("HA token unavailable, skipping config check")
         return None, "missing_token"
