@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.6.2
+- Clarified Supervisor 403 guidance by explaining permission/token fixes before falling back to HA API.
+
 ## v0.6.1
 - Request `supervisor_api` permission so Supervisor `/core/check` validation succeeds.
 - Bump add-on and API version metadata to align with upstream release numbering.

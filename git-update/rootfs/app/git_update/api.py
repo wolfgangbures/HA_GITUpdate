@@ -10,7 +10,7 @@ from .service import GitUpdateService
 
 
 def create_app(service: GitUpdateService) -> FastAPI:
-    app = FastAPI(title="Git Update", version="0.6.1")
+    app = FastAPI(title="Git Update", version="0.6.2")
 
     @app.get("/health")
     async def health() -> dict[str, str]:
