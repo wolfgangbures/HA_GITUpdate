@@ -47,7 +47,7 @@ class HAEventClient:
                 status = exc.response.status_code if exc.response else None
                 if status == 403:
                     _LOGGER.error(
-                        "Supervisor denied /core/check (403). This usually means the add-on instance is missing the supervisor_api permission or the injected SUPERVISOR_TOKEN expired. Restart or reinstall the add-on to refresh permissions; falling back to ha_access_token when available."
+                        "Supervisor denied /core/check (403). Ensure this add-on was rebuilt with supervisor_api access and restarted so Supervisor can inject a fresh SUPERVISOR_TOKEN automatically. Falling back to ha_access_token when available."
                     )
                     if self._fallback_token:
                         return await self._check_config_via_service()

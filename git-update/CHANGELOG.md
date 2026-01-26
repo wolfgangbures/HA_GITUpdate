@@ -1,4 +1,9 @@
 # Changelog
+# Changelog
+
+## v0.6.3
+- Added Home Assistant translation metadata so each option shows a friendly label in the UI.
+- Rephrased Supervisor 403 warning to clarify that tokens refresh automatically after rebuilding/restarting the add-on.
 
 ## v0.6.2
 - Clarified Supervisor 403 guidance by explaining permission/token fixes before falling back to HA API.

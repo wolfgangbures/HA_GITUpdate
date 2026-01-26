@@ -1,0 +1,53 @@
+{
+  "configuration": {
+    "title": "Git Update",
+    "options": {
+      "repo_url": "Repository URL",
+      "branch": "Branch",
+      "access_token": "Git access token",
+      "ha_access_token": "Home Assistant API token",
+      "ha_base_url": "Home Assistant base URL",
+      "ha_verify_ssl": "Verify HA SSL certificates",
+      "poll_interval": "Poll interval (seconds)",
+      "target_path": "Deployment target path",
+      "git_depth": "Git clone depth",
+      "ha_event_name": "Event name",
+      "notify_on_startup": "Notify on startup",
+      "verify_ssl": "Verify Git SSL certificates",
+      "log_level": "Log level",
+      "mqtt_enabled": "Enable MQTT notifications",
+      "mqtt_topic": "MQTT topic",
+      "mqtt_host": "MQTT host",
+      "mqtt_port": "MQTT port",
+      "mqtt_username": "MQTT username",
+      "mqtt_password": "MQTT password",
+      "mqtt_qos": "MQTT QoS",
+      "mqtt_retain": "MQTT retain flag",
+      "http_api_port": "HTTP API port"
+    },
+    "options_description": {
+      "repo_url": "HTTPS or SSH URL of the Git repository to track.",
+      "branch": "Branch or ref to check out (defaults to main).",
+      "access_token": "Personal access token for private Git repositories.",
+      "ha_access_token": "Long-lived Home Assistant token used when Supervisor access is unavailable.",
+      "ha_base_url": "Base URL for direct Home Assistant API calls.",
+      "ha_verify_ssl": "Enable when the Home Assistant base URL has a trusted certificate.",
+      "poll_interval": "Sync interval, in seconds (minimum 60 recommended).",
+      "target_path": "Directory where changed files are copied (usually /config).",
+      "git_depth": "Shallow clone depth; set to 0 for full history.",
+      "ha_event_name": "Event fired after a successful sync.",
+      "notify_on_startup": "Send a notification after the first successful sync.",
+      "verify_ssl": "Toggle TLS verification for the Git remote.",
+      "log_level": "Runtime logging level.",
+      "mqtt_enabled": "Publish change notifications to MQTT.",
+      "mqtt_topic": "MQTT topic used when publishing changes.",
+      "mqtt_host": "MQTT broker hostname.",
+      "mqtt_port": "MQTT broker port.",
+      "mqtt_username": "MQTT username if authentication is required.",
+      "mqtt_password": "MQTT password if authentication is required.",
+      "mqtt_qos": "Quality of Service level for MQTT messages.",
+      "mqtt_retain": "Retain MQTT messages on the broker.",
+      "http_api_port": "Port exposed by the FastAPI management endpoint."
+    }
+  }
+}
