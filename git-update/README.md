@@ -25,7 +25,7 @@ Git Update keeps a local clone of a Git repository inside Home Assistant and sur
 | `mqtt_qos`, `mqtt_retain` | Delivery controls for MQTT messages. |
 | `http_api_port` | Exposes the management REST API. Disable (set to `0`) to turn off the listener. |
 
-> Ensure the add-on manifest includes `homeassistant_api: true` so the Supervisor injects `SUPERVISOR_TOKEN`. If your environment does not provide that token, set `ha_access_token` to a long-lived access token created in your Home Assistant user profile.
+> Ensure the add-on manifest includes both `homeassistant_api: true` **and** `supervisor_api: true` so the Supervisor injects `SUPERVISOR_TOKEN` and allows `/core/check`. If your environment does not provide that token, set `ha_access_token` to a long-lived access token created in your Home Assistant user profile.
 
 ### Obtaining Tokens
 1. **Git provider `access_token`**: Use your Git host's personal-access-token flow (for GitHub, visit *Settings > Developer settings > Personal access tokens > classic/new fine-grained*, select read-only scopes such as `repo:status`/`contents`, and copy the generated token into the add-on config). This PAT must remain secret and can be regenerated at any time if revoked.

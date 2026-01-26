@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.1
+- Request `supervisor_api` permission so Supervisor `/core/check` validation succeeds.
+- Bump add-on and API version metadata to align with upstream release numbering.
+
 ## v0.3.0
 - Added Home Assistant configuration validation after deployment.
 - Fire error events when deployment or HA config validation fails.
