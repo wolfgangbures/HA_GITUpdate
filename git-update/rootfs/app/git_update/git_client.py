@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -28,8 +29,13 @@ class GitRepoManager:
         self._options = options
         self._repo_dir = repo_dir
         self._repo: git.Repo | None = None
+        self._askpass_preflight_done = False
         if not self._options.verify_ssl:
             git.Git().update_environment(GIT_SSL_NO_VERIFY="true")
+
+    def preflight(self) -> None:
+        """Run lightweight startup checks for Git authentication helpers."""
+        self._preflight_askpass()
 
     def ensure_repo(self) -> git.Repo:
         if self._repo is not None:
@@ -73,12 +79,65 @@ class GitRepoManager:
         if not self._options.repo_url.startswith("https://"):
             return env
 
+        self._preflight_askpass()
         askpass = self._askpass_path()
         env["GIT_TERMINAL_PROMPT"] = "0"
         env["GIT_ASKPASS"] = str(askpass)
         env["GIT_UPDATE_ACCESS_TOKEN"] = token
         env["GIT_UPDATE_GIT_USERNAME"] = "x-access-token"
         return env
+
+    def _preflight_askpass(self) -> None:
+        if self._askpass_preflight_done:
+            return
+        self._askpass_preflight_done = True
+
+        token = self._options.access_token or os.getenv("GIT_ACCESS_TOKEN")
+        if not token:
+            return
+
+        if not self._options.repo_url.startswith("https://"):
+            return
+
+        askpass = self._askpass_path()
+        if not askpass.exists():
+            raise RuntimeError(f"Missing GIT_ASKPASS helper: {askpass}")
+
+        # Ensure executable bit where possible.
+        if not os.access(askpass, os.X_OK):
+            try:
+                os.chmod(askpass, 0o700)
+            except OSError:
+                pass
+        if not os.access(askpass, os.X_OK):
+            raise RuntimeError(f"GIT_ASKPASS helper is not executable: {askpass}")
+
+        # Verify the helper can run and returns a username/password without logging secrets.
+        base_env = os.environ.copy()
+        base_env["GIT_UPDATE_GIT_USERNAME"] = "x-access-token"
+        base_env["GIT_UPDATE_ACCESS_TOKEN"] = "x"
+        try:
+            username = subprocess.run(
+                [str(askpass), "Username for 'https://github.com':"],
+                check=True,
+                capture_output=True,
+                text=True,
+                env=base_env,
+            ).stdout.strip()
+            if not username:
+                raise RuntimeError("GIT_ASKPASS helper returned empty username")
+
+            password = subprocess.run(
+                [str(askpass), "Password for 'https://github.com':"],
+                check=True,
+                capture_output=True,
+                text=True,
+                env=base_env,
+            ).stdout
+            if not password:
+                raise RuntimeError("GIT_ASKPASS helper returned empty password")
+        except OSError as exc:
+            raise RuntimeError(f"Failed to execute GIT_ASKPASS helper: {askpass}") from exc
 
     @staticmethod
     def _askpass_path() -> Path:

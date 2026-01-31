@@ -23,6 +23,17 @@ class GitUpdateService:
         self.deployer = FileDeployer(self.options)
         self.notifier = Notifier(self.options)
         self.status = StatusResponse(healthy=True, last_sync=None, pending_reason=None, error=None)
+        try:
+            self.repo.preflight()
+        except Exception as exc:  # noqa: BLE001
+            message = redact(str(exc))
+            _LOGGER.error("Startup preflight failed: %s", message)
+            self.status = StatusResponse(
+                healthy=False,
+                last_sync=None,
+                pending_reason=None,
+                error=message,
+            )
         self._sync_lock = asyncio.Lock()
         self._stop = asyncio.Event()
 
