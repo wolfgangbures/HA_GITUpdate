@@ -1,5 +1,8 @@
 # Changelog
-# Changelog
+
+## v0.6.5
+
+- Fix `GIT_ASKPASS` helper execution by bundling the script in the image (avoids `/data` noexec mounts and fixes malformed script contents).
 
 ## v0.6.4
 
