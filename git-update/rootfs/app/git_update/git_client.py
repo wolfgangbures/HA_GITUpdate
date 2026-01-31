@@ -7,7 +7,7 @@ from pathlib import Path
 
 import git
 
-from .config import Options, REPO_DIR, STATE_DIR
+from .config import Options, REPO_DIR
 from .models import FileChange
 from .secrets import redact_url
 
@@ -73,7 +73,7 @@ class GitRepoManager:
         if not self._options.repo_url.startswith("https://"):
             return env
 
-        askpass = self._ensure_askpass_script()
+        askpass = self._askpass_path()
         env["GIT_TERMINAL_PROMPT"] = "0"
         env["GIT_ASKPASS"] = str(askpass)
         env["GIT_UPDATE_ACCESS_TOKEN"] = token
@@ -81,33 +81,16 @@ class GitRepoManager:
         return env
 
     @staticmethod
-    def _ensure_askpass_script() -> Path:
-        STATE_DIR.mkdir(parents=True, exist_ok=True)
-        script_path = STATE_DIR / "git_askpass.py"
-        if not script_path.exists():
-            script_path.write_text(
-                """#!/usr/bin/env python3\n"
-                "import os\n"
-                "import sys\n"
-                "\n"
-                "prompt = sys.argv[1] if len(sys.argv) > 1 else ''\n"
-                "token = os.environ.get('GIT_UPDATE_ACCESS_TOKEN') or os.environ.get('GIT_ACCESS_TOKEN') or ''\n"
-                "username = os.environ.get('GIT_UPDATE_GIT_USERNAME') or 'x-access-token'\n"
-                "\n"
-                "if 'Username' in prompt:\n"
-                "    sys.stdout.write(username)\n"
-                "elif 'Password' in prompt:\n"
-                "    sys.stdout.write(token)\n"
-                "else:\n"
-                "    sys.stdout.write(token)\n"
-                """,
-                encoding="utf-8",
-            )
+    def _askpass_path() -> Path:
+        """Return path to the bundled askpass helper.
 
+        Avoid /data mounts here: HA add-on data volumes can be mounted with noexec,
+        which prevents Git from executing helpers stored under /data/state.
+        """
+        script_path = Path(__file__).resolve().with_name("git_askpass.py")
         try:
             os.chmod(script_path, 0o700)
         except OSError:
-            # Best-effort; container runtime typically supports chmod.
             pass
         return script_path
 
