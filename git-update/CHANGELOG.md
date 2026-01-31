@@ -1,6 +1,11 @@
 # Changelog
 # Changelog
 
+## v0.6.4
+
+- Fix HTTPS Git auth for non-interactive containers by using `GIT_ASKPASS` instead of embedding tokens in remote URLs.
+- Redact tokens from sync error logs and exposed status.
+
 ## v0.6.3
 - Added Home Assistant translation metadata so each option shows a friendly label in the UI.
 - Rephrased Supervisor 403 warning to clarify that tokens refresh automatically after rebuilding/restarting the add-on.

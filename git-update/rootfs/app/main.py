@@ -11,7 +11,7 @@ from git_update.api import create_app
 from git_update.config import load_options
 from git_update.service import GitUpdateService
 
-__VERSION__ = "0.6.3"
+__VERSION__ = "0.6.4"
 
 
 async def main() -> None:

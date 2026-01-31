@@ -7,8 +7,9 @@ from pathlib import Path
 
 import git
 
-from .config import Options, REPO_DIR
+from .config import Options, REPO_DIR, STATE_DIR
 from .models import FileChange
+from .secrets import redact_url
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ class GitRepoManager:
         if self._repo_dir.exists():
             if (self._repo_dir / ".git").exists():
                 self._repo = git.Repo(self._repo_dir)
+                self._ensure_origin_url(self._repo)
                 return self._repo
             if any(self._repo_dir.iterdir()):
                 raise RuntimeError(
@@ -44,28 +46,81 @@ class GitRepoManager:
             self._repo_dir.rmdir()
 
         self._repo_dir.parent.mkdir(parents=True, exist_ok=True)
-        _LOGGER.info("Cloning %s", self._options.repo_url)
+        _LOGGER.info("Cloning %s", redact_url(self._options.repo_url))
         clone_kwargs: dict[str, object] = {"branch": self._options.branch}
         if self._depth_arg:
             clone_kwargs["depth"] = self._depth_arg
-        self._repo = git.Repo.clone_from(
-            self._auth_repo_url,
-            self._repo_dir,
-            **clone_kwargs,
-        )
+        env = self._git_env()
+        with git.Git().custom_environment(**env):
+            self._repo = git.Repo.clone_from(
+                self._options.repo_url,
+                self._repo_dir,
+                **clone_kwargs,
+            )
+        self._ensure_origin_url(self._repo)
         return self._repo
 
     @property
     def _depth_arg(self) -> int | None:
         return None if self._options.git_depth == 0 else self._options.git_depth
 
-    @property
-    def _auth_repo_url(self) -> str:
+    def _git_env(self) -> dict[str, str]:
+        env: dict[str, str] = {}
         token = self._options.access_token or os.getenv("GIT_ACCESS_TOKEN")
-        if token and self._options.repo_url.startswith("https://"):
-            parts = self._options.repo_url.split("https://", maxsplit=1)[1]
-            return f"https://{token}@{parts}"
-        return self._options.repo_url
+        if not token:
+            return env
+
+        if not self._options.repo_url.startswith("https://"):
+            return env
+
+        askpass = self._ensure_askpass_script()
+        env["GIT_TERMINAL_PROMPT"] = "0"
+        env["GIT_ASKPASS"] = str(askpass)
+        env["GIT_UPDATE_ACCESS_TOKEN"] = token
+        env["GIT_UPDATE_GIT_USERNAME"] = "x-access-token"
+        return env
+
+    @staticmethod
+    def _ensure_askpass_script() -> Path:
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        script_path = STATE_DIR / "git_askpass.py"
+        if not script_path.exists():
+            script_path.write_text(
+                """#!/usr/bin/env python3\n"
+                "import os\n"
+                "import sys\n"
+                "\n"
+                "prompt = sys.argv[1] if len(sys.argv) > 1 else ''\n"
+                "token = os.environ.get('GIT_UPDATE_ACCESS_TOKEN') or os.environ.get('GIT_ACCESS_TOKEN') or ''\n"
+                "username = os.environ.get('GIT_UPDATE_GIT_USERNAME') or 'x-access-token'\n"
+                "\n"
+                "if 'Username' in prompt:\n"
+                "    sys.stdout.write(username)\n"
+                "elif 'Password' in prompt:\n"
+                "    sys.stdout.write(token)\n"
+                "else:\n"
+                "    sys.stdout.write(token)\n"
+                """,
+                encoding="utf-8",
+            )
+
+        try:
+            os.chmod(script_path, 0o700)
+        except OSError:
+            # Best-effort; container runtime typically supports chmod.
+            pass
+        return script_path
+
+    def _ensure_origin_url(self, repo: git.Repo) -> None:
+        try:
+            origin = repo.remotes.origin
+        except Exception:  # noqa: BLE001
+            return
+        try:
+            if origin.url != self._options.repo_url:
+                origin.set_url(self._options.repo_url)
+        except Exception:  # noqa: BLE001
+            return
 
     def sync(self) -> GitSyncResult:
         repo = self.ensure_repo()
@@ -75,18 +130,22 @@ class GitRepoManager:
         fetch_kwargs = {}
         if self._depth_arg:
             fetch_kwargs["depth"] = self._depth_arg
-        origin.fetch(branch, **fetch_kwargs)
-        repo.git.checkout(branch)
+        env = self._git_env()
+        with repo.git.custom_environment(**env):
+            origin.fetch(branch, **fetch_kwargs)
+            repo.git.checkout(branch)
         initial = before is None
         try:
-            repo.git.pull("--ff-only", "origin", branch)
+            with repo.git.custom_environment(**env):
+                repo.git.pull("--ff-only", "origin", branch)
         except git.GitCommandError:
             _LOGGER.warning(
                 "Fast-forward pull failed (divergent branches). Resetting to origin/%s",
                 branch,
             )
-            origin.fetch(branch, force=True, **fetch_kwargs)
-            repo.git.reset("--hard", f"origin/{branch}")
+            with repo.git.custom_environment(**env):
+                origin.fetch(branch, force=True, **fetch_kwargs)
+                repo.git.reset("--hard", f"origin/{branch}")
         after = self._safe_head(repo)
         if initial and after:
             changes = self._collect_all_files(repo)
