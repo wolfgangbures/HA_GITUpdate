@@ -1,53 +1,95 @@
 {
   "configuration": {
-    "title": "Git Update",
-    "options": {
-      "repo_url": "Repository URL",
-      "branch": "Branch",
-      "access_token": "Git access token",
-      "ha_access_token": "Home Assistant API token",
-      "ha_base_url": "Home Assistant base URL",
-      "ha_verify_ssl": "Verify HA SSL certificates",
-      "poll_interval": "Poll interval (seconds)",
-      "target_path": "Deployment target path",
-      "git_depth": "Git clone depth",
-      "ha_event_name": "Event name",
-      "notify_on_startup": "Notify on startup",
-      "verify_ssl": "Verify Git SSL certificates",
-      "log_level": "Log level",
-      "mqtt_enabled": "Enable MQTT notifications",
-      "mqtt_topic": "MQTT topic",
-      "mqtt_host": "MQTT host",
-      "mqtt_port": "MQTT port",
-      "mqtt_username": "MQTT username",
-      "mqtt_password": "MQTT password",
-      "mqtt_qos": "MQTT QoS",
-      "mqtt_retain": "MQTT retain flag",
-      "http_api_port": "HTTP API port"
+    "repo_url": {
+      "name": "Repository URL",
+      "description": "HTTPS or SSH URL of the Git repository to track."
     },
-    "options_description": {
-      "repo_url": "HTTPS or SSH URL of the Git repository to track.",
-      "branch": "Branch or ref to check out (defaults to main).",
-      "access_token": "Personal access token for private Git repositories.",
-      "ha_access_token": "Long-lived Home Assistant token used when Supervisor access is unavailable.",
-      "ha_base_url": "Base URL for direct Home Assistant API calls.",
-      "ha_verify_ssl": "Enable when the Home Assistant base URL has a trusted certificate.",
-      "poll_interval": "Sync interval, in seconds (minimum 60 recommended).",
-      "target_path": "Directory where changed files are copied (usually /config).",
-      "git_depth": "Shallow clone depth; set to 0 for full history.",
-      "ha_event_name": "Event fired after a successful sync.",
-      "notify_on_startup": "Send a notification after the first successful sync.",
-      "verify_ssl": "Toggle TLS verification for the Git remote.",
-      "log_level": "Runtime logging level.",
-      "mqtt_enabled": "Publish change notifications to MQTT.",
-      "mqtt_topic": "MQTT topic used when publishing changes.",
-      "mqtt_host": "MQTT broker hostname.",
-      "mqtt_port": "MQTT broker port.",
-      "mqtt_username": "MQTT username if authentication is required.",
-      "mqtt_password": "MQTT password if authentication is required.",
-      "mqtt_qos": "Quality of Service level for MQTT messages.",
-      "mqtt_retain": "Retain MQTT messages on the broker.",
-      "http_api_port": "Port exposed by the FastAPI management endpoint."
+    "branch": {
+      "name": "Branch",
+      "description": "Branch or ref to check out (defaults to main)."
+    },
+    "access_token": {
+      "name": "Git access token",
+      "description": "Personal access token for private Git repositories."
+    },
+    "ha_access_token": {
+      "name": "Home Assistant API token",
+      "description": "Long-lived Home Assistant token used when Supervisor access is unavailable."
+    },
+    "ha_base_url": {
+      "name": "Home Assistant base URL",
+      "description": "Base URL for direct Home Assistant API calls."
+    },
+    "ha_verify_ssl": {
+      "name": "Verify HA SSL certificates",
+      "description": "Enable when the Home Assistant base URL has a trusted certificate."
+    },
+    "poll_interval": {
+      "name": "Poll interval (seconds)",
+      "description": "Sync interval, in seconds (minimum 60 recommended)."
+    },
+    "target_path": {
+      "name": "Deployment target path",
+      "description": "Directory where changed files are copied (usually /config)."
+    },
+    "git_depth": {
+      "name": "Git clone depth",
+      "description": "Shallow clone depth; set to 0 for full history."
+    },
+    "ha_event_name": {
+      "name": "Event name",
+      "description": "Event fired after a successful sync."
+    },
+    "notify_on_startup": {
+      "name": "Notify on startup",
+      "description": "Send a notification after the first successful sync."
+    },
+    "verify_ssl": {
+      "name": "Verify Git SSL certificates",
+      "description": "Toggle TLS verification for the Git remote."
+    },
+    "log_level": {
+      "name": "Log level",
+      "description": "Runtime logging level."
+    },
+    "mqtt_enabled": {
+      "name": "Enable MQTT notifications",
+      "description": "Publish change notifications to MQTT."
+    },
+    "mqtt_topic": {
+      "name": "MQTT topic",
+      "description": "MQTT topic used when publishing changes."
+    },
+    "mqtt_host": {
+      "name": "MQTT host",
+      "description": "MQTT broker hostname."
+    },
+    "mqtt_port": {
+      "name": "MQTT port",
+      "description": "MQTT broker port."
+    },
+    "mqtt_username": {
+      "name": "MQTT username",
+      "description": "MQTT username if authentication is required."
+    },
+    "mqtt_password": {
+      "name": "MQTT password",
+      "description": "MQTT password if authentication is required."
+    },
+    "mqtt_qos": {
+      "name": "MQTT QoS",
+      "description": "Quality of Service level for MQTT messages."
+    },
+    "mqtt_retain": {
+      "name": "MQTT retain flag",
+      "description": "Retain MQTT messages on the broker."
+    },
+    "http_api_port": {
+      "name": "HTTP API port",
+      "description": "Port exposed by the FastAPI management endpoint."
     }
+  },
+  "network": {
+    "7999/tcp": "FastAPI management endpoint"
   }
 }
