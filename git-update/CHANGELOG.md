@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.7.1
+
+- Add startup preflight check for bundled `git_askpass.py` helper.
+
 ## v0.6.5
 
 - Fix `GIT_ASKPASS` helper execution by bundling the script in the image (avoids `/data` noexec mounts and fixes malformed script contents).
