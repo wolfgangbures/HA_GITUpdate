@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import traceback
 from datetime import datetime, timezone
 from typing import Any
 
@@ -10,6 +11,7 @@ from .deployer import DeploymentError, FileDeployer
 from .git_client import GitRepoManager
 from .models import StatusResponse, SyncMetadata
 from .notifier import Notifier
+from .secrets import redact
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,10 +64,10 @@ class GitUpdateService:
                 try:
                     await asyncio.to_thread(self.deployer.deploy, result.changes)
                 except DeploymentError as exc:
-                    _LOGGER.error("Deployment failed: %s", exc)
+                    _LOGGER.error("Deployment failed: %s", redact(str(exc)))
                     await self.notifier.notify_error(
                         "deployment_error",
-                        str(exc),
+                        redact(str(exc)),
                         result.branch,
                         result.after,
                     )
@@ -73,7 +75,7 @@ class GitUpdateService:
                         healthy=False,
                         last_sync=metadata,
                         pending_reason=None,
-                        error=str(exc),
+                        error=redact(str(exc)),
                     )
                     return
 
@@ -86,7 +88,7 @@ class GitUpdateService:
                     _LOGGER.error(error_msg)
                     await self.notifier.notify_error(
                         "config_validation_error",
-                        error_msg,
+                        redact(error_msg),
                         result.branch,
                         result.after,
                     )
@@ -94,7 +96,7 @@ class GitUpdateService:
                         healthy=False,
                         last_sync=metadata,
                         pending_reason=None,
-                        error=error_msg,
+                        error=redact(error_msg),
                     )
                     return
                 if is_valid is None:
@@ -118,12 +120,17 @@ class GitUpdateService:
             if should_notify:
                 await self.notifier.notify(result.changes, result.branch, result.after, reason)
         except Exception as exc:  # noqa: BLE001
-            _LOGGER.exception("Sync failed: %s", exc)
+            redacted = redact(str(exc))
+            _LOGGER.error("Sync failed: %s", redacted)
+            _LOGGER.debug(
+                "Sync failure traceback (message redacted):\n%s",
+                "".join(traceback.format_tb(exc.__traceback__)),
+            )
             self.status = StatusResponse(
                 healthy=False,
                 last_sync=self.status.last_sync,
                 pending_reason=None,
-                error=str(exc),
+                error=redacted,
             )
 
     def public_config(self) -> dict[str, Any]:
