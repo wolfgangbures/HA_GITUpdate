@@ -15,11 +15,13 @@ def main() -> int:
     username = os.environ.get("GIT_UPDATE_GIT_USERNAME") or "x-access-token"
 
     if "Username" in prompt:
-        sys.stdout.write(username)
+        sys.stdout.write(username + "\n")
+        sys.stdout.flush()
         return 0
 
     # Git sometimes asks "Password", sometimes it just asks for credentials.
-    sys.stdout.write(token)
+    sys.stdout.write(token + "\n")
+    sys.stdout.flush()
     return 0
 
 
