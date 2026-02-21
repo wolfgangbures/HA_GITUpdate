@@ -44,5 +44,7 @@
 - Always split branches by feature/fix for PRs; avoid working directly on `main`.
 - Write clear, descriptive commit messages; reference related issues/PRs when applicable.
 - Create PRs with me as approver.
-- Tag releases in GitHub matching the version in `manifest.json`.
-- increment the version in `manifest.json` for every PR that changes functionality.
+- **ALWAYS create beta releases first** (e.g., v0.7.3-beta) using `--prerelease` flag before creating stable releases.
+- Only create stable releases after beta has been tested and approved.
+- Tag releases in GitHub matching the version in `config.json`.
+- Increment the version in `config.json` for every PR that changes functionality.
