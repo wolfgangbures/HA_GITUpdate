@@ -57,12 +57,13 @@ class GitRepoManager:
         if self._depth_arg:
             clone_kwargs["depth"] = self._depth_arg
         env = self._git_env()
-        with git.Git().custom_environment(**env):
-            self._repo = git.Repo.clone_from(
-                self._options.repo_url,
-                self._repo_dir,
-                **clone_kwargs,
-            )
+        if env:
+            clone_kwargs["env"] = env
+        self._repo = git.Repo.clone_from(
+            self._options.repo_url,
+            self._repo_dir,
+            **clone_kwargs,
+        )
         self._ensure_origin_url(self._repo)
         return self._repo
 
@@ -173,8 +174,10 @@ class GitRepoManager:
         if self._depth_arg:
             fetch_kwargs["depth"] = self._depth_arg
         env = self._git_env()
+        if env:
+            fetch_kwargs["env"] = env
+        origin.fetch(branch, **fetch_kwargs)
         with repo.git.custom_environment(**env):
-            origin.fetch(branch, **fetch_kwargs)
             repo.git.checkout(branch)
         initial = before is None
         try:
@@ -185,8 +188,8 @@ class GitRepoManager:
                 "Fast-forward pull failed (divergent branches). Resetting to origin/%s",
                 branch,
             )
+            origin.fetch(branch, force=True, **fetch_kwargs)
             with repo.git.custom_environment(**env):
-                origin.fetch(branch, force=True, **fetch_kwargs)
                 repo.git.reset("--hard", f"origin/{branch}")
         after = self._safe_head(repo)
         if initial and after:
