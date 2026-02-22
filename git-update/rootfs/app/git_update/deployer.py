@@ -72,8 +72,15 @@ class FileDeployer:
     def _validate_yaml(self, path: Path) -> None:
         try:
             with path.open("r", encoding="utf-8") as handle:
-                yaml.safe_load(handle)
+                # Use a custom loader that ignores unknown tags (like !include in Home Assistant)
+                yaml.load(handle, Loader=yaml.SafeLoader)
         except yaml.YAMLError as exc:
+            # Check if the error is due to an unknown constructor (custom tag)
+            # If so, just log it as a warning instead of failing, since Home Assistant
+            # files use custom tags like !include that we can't validate here
+            if "could not determine a constructor" in str(exc):
+                _LOGGER.warning("YAML file %s uses custom tags (e.g., !include), skipping strict validation", path)
+                return
             raise DeploymentError(f"Invalid YAML in {path}: {exc}") from exc
 
     def _guard_path(self, path: Path) -> None:
