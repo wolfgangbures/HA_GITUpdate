@@ -17,6 +17,18 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class GitUpdateService:
+    async def trigger_full_sync(self, reason: str) -> None:
+        async with self._sync_lock:
+            self.status.pending_reason = reason
+            try:
+                await asyncio.to_thread(self.deployer.full_sync)
+                self.status.healthy = True
+                self.status.error = None
+            except DeploymentError as exc:
+                self.status.healthy = False
+                self.status.error = redact(str(exc))
+            finally:
+                self.status.pending_reason = None
     def __init__(self, options: Options | None = None) -> None:
         self.options = options or load_options()
         self.repo = GitRepoManager(self.options)

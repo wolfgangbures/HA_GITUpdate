@@ -18,6 +18,7 @@ class DeploymentError(RuntimeError):
 
 
 class FileDeployer:
+
     def __init__(self, options: Options) -> None:
         self._repo_dir = REPO_DIR.resolve()
         self._target_base = Path(options.target_path).resolve()
@@ -26,6 +27,16 @@ class FileDeployer:
     def deploy(self, changes: Iterable[FileChange]) -> None:
         for change in changes:
             self._apply_change(change)
+
+    def full_sync(self) -> None:
+        """Copy/update all files from the repo to the target config directory, without deleting extras."""
+        for repo_file in self._repo_dir.rglob("*"):
+            if repo_file.is_file():
+                rel_path = repo_file.relative_to(self._repo_dir)
+                target_path = (self._target_base / rel_path).resolve()
+                self._guard_repo_path(repo_file)
+                self._guard_path(target_path)
+                self._copy_file(repo_file, target_path)
 
     def _apply_change(self, change: FileChange) -> None:
         repo_path = (self._repo_dir / change.path).resolve()
