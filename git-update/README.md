@@ -94,11 +94,26 @@ Payload:
 | `POST` | `/sync` | Immediately triggers a sync (body optional `{ "reason": "manual" }`). |
 | `GET` | `/config` | Shows the effective runtime configuration minus secrets. |
 
-## Local Development
-1. Install Python 3.12 and create a virtual environment.
-2. Install requirements from `rootfs/app/requirements.txt`.
-3. Create `dev/options.json` that mirrors the add-on schema, including a writable `target_path`.
-4. Run `python git-update/rootfs/app/main.py` to start the scheduler and API locally.
+## Full-Sync Feature
+
+### What is Full-Sync?
+The full-sync operation ensures that every file present in your configured Git repository is copied or updated in your Home Assistant config directory, regardless of modification times or hashes. It does NOT delete any extra files that may exist in your config directory.
+
+### How to Trigger a Full-Sync
+- **API**: Send a POST request to `/full-sync` on the add-on's HTTP API (default port 7999).
+  - Example: `curl -X POST http://localhost:7999/full-sync -d '{"reason":"manual"}'`
+- **Add-on Panel**: (Planned) Use the "Full Sync" button in the add-on config panel to trigger this operation from the UI.
+
+### When to Use
+- After disaster recovery or restoring from backup
+- If you suspect some files from the repo are missing or outdated in your config
+- To force a refresh of all repo files into your Home Assistant config directory
+
+### What it Does
+- Copies/updates all files from the repo to the config directory
+- Does NOT remove or overwrite files that exist only in the config directory
+
+---
 
 ## Release Process
 1. Update `CHANGELOG.md` with highlights.

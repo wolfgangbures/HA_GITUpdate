@@ -10,6 +10,12 @@ from .service import GitUpdateService
 
 
 def create_app(service: GitUpdateService) -> FastAPI:
+
+        @app.post("/full-sync")
+        async def full_sync(body: dict[str, Any] | None = None) -> StatusResponse:
+            reason = (body or {}).get("reason", "manual-full-sync")
+            await service.trigger_full_sync(reason)
+            return service.status
     app = FastAPI(title="Git Update", version="0.7.1")
 
     @app.get("/health")
