@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.7.5-beta
+
+- Fix error events firing to wrong HA endpoint; deployment and validation failures now correctly fire `{event_name}.error` instead of `{event_name}`.
+
 ## v0.7.1
 
 - Add startup preflight check for bundled `git_askpass.py` helper.

@@ -60,7 +60,7 @@ class Notifier:
             "commit": commit,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
-        await self._ha.fire_event(payload)
+        await self._ha.fire_event(payload, event_name=f"{self._options.ha_event_name}.error")
         await self._mqtt.publish(
             MqttPayload(
                 topic=f"{self._mqtt_settings.topic}/error",

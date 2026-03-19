@@ -139,16 +139,17 @@ class HAEventClient:
         except TypeError:
             return str(value)
 
-    async def fire_event(self, payload: dict[str, Any]) -> None:
+    async def fire_event(self, payload: dict[str, Any], event_name: str | None = None) -> None:
         token: str | None
         url: str
+        name = event_name or self._event_name
 
         if self._supervisor_token:
             token = self._supervisor_token
-            url = f"{SUPERVISOR_API}/core/api/events/{self._event_name}"
+            url = f"{SUPERVISOR_API}/core/api/events/{name}"
         elif self._fallback_token:
             token = self._fallback_token
-            url = f"{self._base_url}/api/events/{self._event_name}"
+            url = f"{self._base_url}/api/events/{name}"
         else:
             _LOGGER.warning("HA token unavailable, skipping event emission")
             return
