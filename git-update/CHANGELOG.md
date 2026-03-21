@@ -1,8 +1,9 @@
 # Changelog
 
-## v0.7.5-beta
+## v0.7.5
 
 - Fix error events firing to wrong HA endpoint; deployment and validation failures now correctly fire `{event_name}.error` instead of `{event_name}`.
+- Fix `api.py` indentation corruption and hardcoded version; version is now read dynamically from `config.json`.
 
 ## v0.7.1
 
